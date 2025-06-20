@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All-in-One Converter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --secondary: #3f37c9;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --success: #4cc9f0;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+        }
+
+        [data-theme="dark"] {
+            --primary: #4895ef;
+            --primary-light: #4361ee;
+            --secondary: #560bad;
+            --dark: #f8f9fa;
+            --light: #1a1a2e;
+            --gray: #adb5bd;
+            --card-bg: #16213e;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .logo i {
+            font-size: 2rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark);
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .converter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background-color: var(--card-bg);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .converter-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .converter-tab {
+            display: none;
+        }
+
+        .converter-tab.active {
+            display: block;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid var(--gray);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            background-color: var(--light);
+            color: var(--dark);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        select {
+            padding: 15px;
+            border: 1px solid var(--gray);
+            border-radius: var(--border-radius);
+            background-color: var(--light);
+            color: var(--dark);
+            font-size: 1rem;
+            min-width: 200px;
+            cursor: pointer;
+        }
+
+        .swap-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px auto;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .swap-btn:hover {
+            background-color: var(--primary-light);
+            transform: rotate(180deg);
+        }
+
+        .convert-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 15px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px auto;
+        }
+
+        .convert-btn:hover {
+            background-color: var(--primary-light);
+        }
+
+        .info-text {
+            text-align: center;
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 50px;
+        }
+
+        .feature-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .feature-card i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .input-row {
+                flex-direction: column;
+            }
+            
+            select {
+                width: 100%;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-exchange-alt"></i>
+                <span>All-in-One Converter</span>
+            </div>
+            <button class="theme-toggle" id="theme-toggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </header>
+
+        <section class="hero">
+            <h1>Convert Anything, Anywhere</h1>
+            <p>Free online conversion tools for currency, length, weight, temperature and more</p>
+        </section>
+
+        <div class="converter-tabs">
+            <button class="tab-btn active" data-tab="currency">Currency</button>
+            <button class="tab-btn" data-tab="length">Length</button>
+            <button class="tab-btn" data-tab="weight">Weight</button>
+            <button class="tab-btn" data-tab="temperature">Temperature</button>
+            <button class="tab-btn" data-tab="volume">Volume</button>
+        </div>
+
+        <!-- Currency Converter -->
+        <div id="currency" class="converter-tab active">
+            <div class="converter-card">
+                <div class="input-group">
+                    <div class="input-row">
+                        <input type="number" id="currency-amount" value="1" min="0" step="0.01" placeholder="Amount">
+                        <select id="currency-from"></select>
+                    </div>
+                    
+                    <div class="input-row">
+                        <input type="number" id="currency-result" readonly placeholder="Result">
+                        <select id="currency-to"></select>
+                    </div>
+                    
+                    <div class="input-row">
+                        <button class="swap-btn" id="swap-currencies">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+                    </div>
+                    
+                    <button class="convert-btn" id="convert-currency">
+                        <i class="fas fa-calculator"></i> Convert
+                    </button>
+                </div>
+                
+                <div class="info-text">
+                    <p>Exchange rate: 1 <span id="base-currency">USD</span> = <span id="exchange-rate">...</span> <span id="target-currency">EUR</span></p>
+                    <p>Last updated: <span id="rate-update-time">Loading...</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Length Converter -->
+        <div id="length" class="converter-tab">
+            <div class="converter-card">
+                <div class="input-group">
+                    <div class="input-row">
+                        <input type="number" id="length-amount" value="1" min="0" step="0.01" placeholder="Value">
+                        <select id="length-from">
+                            <option value="mm">Millimeter (mm)</option>
+                            <option value="cm">Centimeter (cm)</option>
+                            <option value="m">Meter (m)</option>
+                            <option value="km">Kilometer (km)</option>
+                            <option value="in">Inch (in)</option>
+                            <option value="ft">Foot (ft)</option>
+                            <option value="yd">Yard (yd)</option>
+                            <option value="mi">Mile (mi)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-row">
+                        <input type="number" id="length-result" readonly placeholder="Result">
+                        <select id="length-to">
+                            <option value="cm">Centimeter (cm)</option>
+                            <option value="m">Meter (m)</option>
+                            <option value="mm">Millimeter (mm)</option>
+                            <option value="km">Kilometer (km)</option>
+                            <option value="in">Inch (in)</option>
+                            <option value="ft">Foot (ft)</option>
+                            <option value="yd">Yard (yd)</option>
+                            <option value="mi">Mile (mi)</option>
+                        </select>
+                    </div>
+                    
+                    <button class="swap-btn" onclick="swapUnits('length')">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weight Converter -->
+        <div id="weight" class="converter-tab">
+            <div class="converter-card">
+                <div class="input-group">
+                    <div class="input-row">
+                        <input type="number" id="weight-amount" value="1" min="0" step="0.01" placeholder="Value">
+                        <select id="weight-from">
+                            <option value="mg">Milligram (mg)</option>
+                            <option value="g">Gram (g)</option>
+                            <option value="kg">Kilogram (kg)</option>
+                            <option value="t">Metric Ton (t)</option>
+                            <option value="oz">Ounce (oz)</option>
+                            <option value="lb">Pound (lb)</option>
+                            <option value="st">Stone (st)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-row">
+                        <input type="number" id="weight-result" readonly placeholder="Result">
+                        <select id="weight-to">
+                            <option value="g">Gram (g)</option>
+                            <option value="kg">Kilogram (kg)</option>
+                            <option value="mg">Milligram (mg)</option>
+                            <option value="t">Metric Ton (t)</option>
+                            <option value="oz">Ounce (oz)</option>
+                            <option value="lb">Pound (lb)</option>
+                            <option value="st">Stone (st)</option>
+                        </select>
+                    </div>
+                    
+                    <button class="swap-btn" onclick="swapUnits('weight')">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Temperature Converter -->
+        <div id="temperature" class="converter-tab">
+            <div class="converter-card">
+                <div class="input-group">
+                    <div class="input-row">
+                        <input type="number" id="temp-amount" value="0" step="0.1" placeholder="Value">
+                        <select id="temp-from">
+                            <option value="c">Celsius (°C)</option>
+                            <option value="f">Fahrenheit (°F)</option>
+                            <option value="k">Kelvin (K)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-row">
+                        <input type="number" id="temp-result" readonly placeholder="Result">
+                        <select id="temp-to">
+                            <option value="f">Fahrenheit (°F)</option>
+                            <option value="c">Celsius (°C)</option>
+                            <option value="k">Kelvin (K)</option>
+                        </select>
+                    </div>
+                    
+                    <button class="swap-btn" onclick="swapUnits('temp')">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Volume Converter -->
+        <div id="volume" class="converter-tab">
+            <div class="converter-card">
+                <div class="input-group">
+                    <div class="input-row">
+                        <input type="number" id="volume-amount" value="1" min="0" step="0.01" placeholder="Value">
+                        <select id="volume-from">
+                            <option value="ml">Milliliter (ml)</option>
+                            <option value="l">Liter (l)</option>
+                            <option value="m3">Cubic meter (m³)</option>
+                            <option value="tsp">Teaspoon (tsp)</option>
+                            <option value="tbsp">Tablespoon (tbsp)</option>
+                            <option value="fl-oz">Fluid Ounce (fl oz)</option>
+                            <option value="cup">Cup (cup)</option>
+                            <option value="pt">Pint (pt)</option>
+                            <option value="qt">Quart (qt)</option>
+                            <option value="gal">Gallon (gal)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-row">
+                        <input type="number" id="volume-result" readonly placeholder="Result">
+                        <select id="volume-to">
+                            <option value="l">Liter (l)</option>
+                            <option value="ml">Milliliter (ml)</option>
+                            <option value="m3">Cubic meter (m³)</option>
+                            <option value="tsp">Teaspoon (tsp)</option>
+                            <option value="tbsp">Tablespoon (tbsp)</option>
+                            <option value="fl-oz">Fluid Ounce (fl oz)</option>
+                            <option value="cup">Cup (cup)</option>
+                            <option value="pt">Pint (pt)</option>
+                            <option value="qt">Quart (qt)</option>
+                            <option value="gal">Gallon (gal)</option>
+                        </select>
+                    </div>
+                    
+                    <button class="swap-btn" onclick="swapUnits('volume')">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <i class="fas fa-bolt"></i>
+                <h3>Fast Conversions</h3>
+                <p>Get instant results with our lightning-fast conversion tools</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-globe"></i>
+                <h3>Global Currencies</h3>
+                <p>Convert between all world currencies with live exchange rates</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-mobile-alt"></i>
+                <h3>Mobile Friendly</h3>
+                <p>Works perfectly on all your devices</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Privacy Focused</h3>
+                <p>We don't store or track your conversions</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>© <span id="current-year"></span> All-in-One Converter. All rights reserved.</p>
+            <p>Exchange rates provided by <a href="https://exchangerate.host/" target="_blank">exchangerate.host</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // Common currencies to show first
+        const popularCurrencies = [
+            'USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'CNY', 
+            'INR', 'SGD', 'NZD', 'MXN', 'BRL', 'ZAR', 'RUB'
+        ];
+
+        let exchangeRates = {};
+        let allCurrencies = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current year
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+            
+            // Theme toggle
+            const themeToggle = document.getElementById('theme-toggle');
+            const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+            
+            // Check for saved theme preference or use system preference
+            const currentTheme = localStorage.getItem('theme') || 
+                                (prefersDarkScheme.matches ? 'dark' : 'light');
+            
+            if (currentTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+            
+            themeToggle.addEventListener('click', function() {
+                if (document.body.hasAttribute('data-theme')) {
+                    document.body.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                } else {
+                    document.body.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                }
+            });
+
+            // Tab switching
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.converter-tab');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    button.classList.add('active');
+                    const tabId = button.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    if (tabId === 'currency') {
+                        fetchExchangeRates();
+                    }
+                });
+            });
+
+            // Initialize converters
+            initCurrencyConverter();
+            initLengthConverter();
+            initWeightConverter();
+            initTemperatureConverter();
+            initVolumeConverter();
+        });
+
+        // Currency Converter
+        function initCurrencyConverter() {
+            const amountInput = document.getElementById('currency-amount');
+            const fromSelect = document.getElementById('currency-from');
+            const toSelect = document.getElementById('currency-to');
+            const resultInput = document.getElementById('currency-result');
+            const swapBtn = document.getElementById('swap-currencies');
+            const convertBtn = document.getElementById('convert-currency');
+            const rateUpdateTime = document.getElementById('rate-update-time');
+            const baseCurrency = document.getElementById('base-currency');
+            const targetCurrency = document.getElementById('target-currency');
+            const exchangeRate = document.getElementById('exchange-rate');
+            
+            // Fetch exchange rates on page load
+            fetchExchangeRates();
+            
+            // Event listeners
+            amountInput.addEventListener('input', convertCurrency);
+            fromSelect.addEventListener('change', convertCurrency);
+            toSelect.addEventListener('change', convertCurrency);
+            swapBtn.addEventListener('click', swapCurrencies);
+            convertBtn.addEventListener('click', convertCurrency);
+            
+            function swapCurrencies() {
+                const temp = fromSelect.value;
+                fromSelect.value = toSelect.value;
+                toSelect.value = temp;
+                convertCurrency();
+            }
+            
+            async function fetchExchangeRates() {
+                try {
+                    const response = await fetch('https://api.exchangerate.host/latest?base=USD');
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        exchangeRates = data.rates;
+                        allCurrencies = Object.keys(data.rates).sort();
+                        
+                        // Update last updated time
+                        const updateTime = new Date(data.date).toLocaleString();
+                        rateUpdateTime.textContent = updateTime;
+                        
+                        // Populate currency dropdowns
+                        populateCurrencyDropdowns();
+                        
+                        // Perform initial conversion
+                        convertCurrency();
+                    }
+                } catch (error) {
+                    console.error('Error fetching exchange rates:', error);
+                    rateUpdateTime.textContent = 'Failed to load rates';
+                }
+            }
+            
+            function populateCurrencyDropdowns() {
+                // Clear existing options
+                fromSelect.innerHTML = '';
+                toSelect.innerHTML = '';
+                
+                // Add popular currencies first
+                popularCurrencies.forEach(currency => {
+                    addCurrencyOption(fromSelect, currency);
+                    addCurrencyOption(toSelect, currency);
+                });
+                
+                // Add separator
+                addSeparator(fromSelect);
+                addSeparator(toSelect);
+                
+                // Add all other currencies
+                allCurrencies.forEach(currency => {
+                    if (!popularCurrencies.includes(currency)) {
+                        addCurrencyOption(fromSelect, currency);
+                        addCurrencyOption(toSelect, currency);
+                    }
+                });
+                
+                // Set default values
+                fromSelect.value = 'USD';
+                toSelect.value = 'EUR';
+            }
+            
+            function addCurrencyOption(selectElement, currencyCode) {
+                const option = document.createElement('option');
+                option.value = currencyCode;
+                
+                try {
+                    const currencyName = new Intl.DisplayNames(['en'], { type: 'currency' }).of(currencyCode);
+                    option.textContent = `${currencyCode} - ${currencyName || currencyCode}`;
+                } catch {
+                    option.textContent = currencyCode;
+                }
+                
+                selectElement.appendChild(option);
+            }
+            
+            function addSeparator(selectElement) {
+                const separator = document.createElement('option');
+                separator.disabled = true;
+                separator.textContent = '──────────';
+                selectElement.appendChild(separator);
+            }
+            
+            function convertCurrency() {
+                const amount = parseFloat(amountInput.value) || 0;
+                const fromCurrency = fromSelect.value;
+                const toCurrency = toSelect.value;
+                
+                // Update displayed currencies
+                baseCurrency.textContent = fromCurrency;
+                targetCurrency.textContent = toCurrency;
+                
+                // If we have the rates, perform conversion
+                if (exchangeRates[fromCurrency] && exchangeRates[toCurrency]) {
+                    // Convert from source currency to USD first (if needed)
+                    const amountInUSD = fromCurrency === 'USD' ? amount : amount / exchangeRates[fromCurrency];
+                    
+                    // Convert from USD to target currency
+                    const result = toCurrency === 'USD' ? amountInUSD : amountInUSD * exchangeRates[toCurrency];
+                    
+                    // Display result with 6 decimal places max
+                    resultInput.value = result.toFixed(6).replace(/\.?0+$/, '');
+                    
+                    // Display exchange rate
+                    const rate = fromCurrency === 'USD' ? 
+                        exchangeRates[toCurrency] : 
+                        exchangeRates[toCurrency] / exchangeRates[fromCurrency];
+                    
+                    exchangeRate.textContent = rate.toFixed(6).replace(/\.?0+$/, '');
+                }
+            }
+        }
+
+        // Length Converter
+        function initLengthConverter() {
+            const amountInput = document.getElementById('length-amount');
+            const fromSelect = document.getElementById('length-from');
+            const toSelect = document.getElementById('length-to');
+            const resultInput = document.getElementById('length-result');
+            
+            // Conversion factors relative to meter (SI unit)
+            const lengthUnits = {
+                mm: 0.001,
+                cm: 0.01,
+                m: 1,
+                km: 1000,
+                in: 0.0254,
+                ft: 0.3048,
+                yd: 0.9144,
+                mi: 1609.344
+            };
+            
+            // Event listeners
+            amountInput.addEventListener('input', convertLength);
+            fromSelect.addEventListener('change', convertLength);
+            toSelect.addEventListener('change', convertLength);
+            
+            convertLength();
+            
+            function convertLength() {
+                const amount = parseFloat(amountInput.value) || 0;
+                const fromUnit = fromSelect.value;
+                const toUnit = toSelect.value;
+                
+                // Convert to meters first
+                const meters = amount * lengthUnits[fromUnit];
+                
+                // Convert from meters to target unit
+                const result = meters / lengthUnits[toUnit];
+                
+                // Display result with 6 decimal places max
+                resultInput.value = result.toFixed(6).replace(/\.?0+$/, '');
+            }
+        }
+
+        // Weight Converter
+        function initWeightConverter() {
+            const amountInput = document.getElementById('weight-amount');
+            const fromSelect = document.getElementById('weight-from');
+            const toSelect = document.getElementById('weight-to');
+            const resultInput = document.getElementById('weight-result');
+            
+            // Conversion factors relative to kilogram (SI unit)
+            const weightUnits = {
+                mg: 0.000001,
+                g: 0.001,
+                kg: 1,
+                t: 1000,
+                oz: 0.0283495,
+                lb: 0.453592,
+                st: 6.35029
+            };
+            
+            // Event listeners
+            amountInput.addEventListener('input', convertWeight);
+            fromSelect.addEventListener('change', convertWeight);
+            toSelect.addEventListener('change', convertWeight);
+            
+            convertWeight();
+            
+            function convertWeight() {
+                const amount = parseFloat(amountInput.value) || 0;
+                const fromUnit = fromSelect.value;
+                const toUnit = toSelect.value;
+                
+                // Convert to kilograms first
+                const kilograms = amount * weightUnits[fromUnit];
+                
+                // Convert from kilograms to target unit
+                const result = kilograms / weightUnits[toUnit];
+                
+                // Display result with 6 decimal places max
+                resultInput.value = result.toFixed(6).replace(/\.?0+$/, '');
+            }
+        }
+
+        // Temperature Converter
+        function initTemperatureConverter() {
+            const amountInput = document.getElementById('temp-amount');
+            const fromSelect = document.getElementById('temp-from');
+            const toSelect = document.getElementById('temp-to');
+            const resultInput = document.getElementById('temp-result');
+            
+            // Event listeners
+            amountInput.addEventListener('input', convertTemperature);
+            fromSelect.addEventListener('change', convertTemperature);
+            toSelect.addEventListener('change', convertTemperature);
+            
+            convertTemperature();
+            
+            function convertTemperature() {
+                const amount = parseFloat(amountInput.value) || 0;
+                const fromUnit = fromSelect.value;
+                const toUnit = toSelect.value;
+                
+                let result;
+                
+                // Convert to Celsius first
+                let celsius;
+                switch (fromUnit) {
+                    case 'c':
+                        celsius = amount;
+                        break;
+                    case 'f':
+                        celsius = (amount - 32) * 5/9;
+                        break;
+                    case 'k':
+                        celsius = amount - 273.15;
+                        break;
+                }
+                
+                // Convert from Celsius to target unit
+                switch (toUnit) {
+                    case 'c':
+                        result = celsius;
+                        break;
+                    case 'f':
+                        result = (celsius * 9/5) + 32;
+                        break;
+                    case 'k':
+                        result = celsius + 273.15;
+                        break;
+                }
+                
+                // Display result with 2 decimal places max
+                resultInput.value = result.toFixed(2).replace(/\.?0+$/, '');
+            }
+        }
+
+        // Volume Converter
+        function initVolumeConverter() {
+            const amountInput = document.getElementById('volume-amount');
+            const fromSelect = document.getElementById('volume-from');
+            const toSelect = document.getElementById('volume-to');
+            const resultInput = document.getElementById('volume-result');
+            
+            // Conversion factors relative to liter (SI unit)
+            const volumeUnits = {
+                ml: 0.001,
+                l: 1,
+                m3: 1000,
+                tsp: 0.00492892,
+                tbsp: 0.0147868,
+                'fl-oz': 0.0295735,
+                cup: 0.236588,
+                pt: 0.473176,
+                qt: 0.946353,
+                gal: 3.78541
+            };
+            
+            // Event listeners
+            amountInput.addEventListener('input', convertVolume);
+            fromSelect.addEventListener('change', convertVolume);
+            toSelect.addEventListener('change', convertVolume);
+            
+            convertVolume();
+            
+            function convertVolume() {
+                const amount = parseFloat(amountInput.value) || 0;
+                const fromUnit = fromSelect.value;
+                const toUnit = toSelect.value;
+                
+                // Convert to liters first
+                const liters = amount * volumeUnits[fromUnit];
+                
+                // Convert from liters to target unit
+                const result = liters / volumeUnits[toUnit];
+                
+                // Display result with 6 decimal places max
+                resultInput.value = result.toFixed(6).replace(/\.?0+$/, '');
+            }
+        }
+
+        // Swap units function for all converters except currency
+        function swapUnits(type) {
+            const fromSelect = document.getElementById(`${type}-from`);
+            const toSelect = document.getElementById(`${type}-to`);
+            
+            const temp = fromSelect.value;
+            fromSelect.value = toSelect.value;
+            toSelect.value = temp;
+            
+            // Trigger conversion
+            switch (type) {
+                case 'length':
+                    document.getElementById('length-amount').dispatchEvent(new Event('input'));
+                    break;
+                case 'weight':
+                    document.getElementById('weight-amount').dispatchEvent(new Event('input'));
+                    break;
+                case 'temp':
+                    document.getElementById('temp-amount').dispatchEvent(new Event('input'));
+                    break;
+                case 'volume':
+                    document.getElementById('volume-amount').dispatchEvent(new Event('input'));
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>
